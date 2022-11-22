@@ -33,9 +33,11 @@ const removeContact = async contactId => {
   return removeContact;
 };
 
-const addContact = async (name, email, phone) => {
+const addContact = async body => {
+  const { name, email, phone } = body;
   const contacts = await listContacts();
   const newContact = { id: v4(), name, email, phone };
+
   contacts.push(newContact);
   await fs.writeFile(contactsPath, JSON.stringify(contacts));
   return newContact;
