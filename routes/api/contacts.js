@@ -3,24 +3,40 @@ const express = require('express');
 const router = express.Router();
 
 const { addValidation } = require('../../middlewares/validation.js');
-const { postSchema, putSchema } = require('../../schema/schema.js');
+const {
+  postSchema,
+  putSchema,
+  putchSchema,
+} = require('../../schema/schema.js');
+const { tryCatchWrapper } = require('../../helpers/tryCatchWrapper.js');
 
 const {
   getContacts,
   getOneContactById,
   postContact,
   deleteContact,
-  putContact,
+  updateContact,
+  updateStatusContact,
 } = require('../../controllers/contactControls.js');
 
-router.get('/', getContacts);
+router.get('/', tryCatchWrapper(getContacts));
 
-router.get('/:contactId', getOneContactById);
+router.get('/:contactId', tryCatchWrapper(getOneContactById));
 
-router.post('/', addValidation(postSchema), postContact);
+router.post('/', addValidation(postSchema), tryCatchWrapper(postContact));
 
-router.delete('/:contactId', deleteContact);
+router.delete('/:contactId', tryCatchWrapper(deleteContact));
 
-router.put('/:contactId', addValidation(putSchema), putContact);
+router.put(
+  '/:contactId',
+  addValidation(putSchema),
+  tryCatchWrapper(updateContact),
+);
+
+router.patch(
+  '/:contactId',
+  addValidation(putchSchema),
+  tryCatchWrapper(updateStatusContact),
+);
 
 module.exports = router;
