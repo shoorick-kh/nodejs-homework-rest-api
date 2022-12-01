@@ -9,10 +9,11 @@ const getContacts = async (req, res, next) => {
 const getOneContactById = async (req, res, next) => {
   const { contactId } = req.params;
   const data = await Contact.findById(contactId);
-  if (data) {
-    res.status(200).json({ status: 200, contact: data });
+
+  if (!data) {
+    throw createError(404, 'Not found');
   }
-  next(createError(404, 'Not found'));
+  res.status(200).json({ status: 200, contact: data });
 };
 
 const postContact = async (req, res, next) => {
@@ -23,40 +24,43 @@ const postContact = async (req, res, next) => {
 const deleteContact = async (req, res, next) => {
   const { contactId } = req.params;
   const data = await Contact.findById(contactId);
-  if (data) {
-    await Contact.findByIdAndDelete(contactId);
-    res.status(200).json({ message: 'contact deleted' });
+
+  if (!data) {
+    throw createError(404, 'Not found');
   }
-  return next(createError(404, 'Not found'));
+  await Contact.findByIdAndDelete(contactId);
+  res.status(200).json({ message: 'contact deleted' });
 };
 
 const updateContact = async (req, res, next) => {
   const { contactId } = req.params;
+  const body = req.body;
 
-  const data = await Contact.findByIdAndUpdate(contactId, req.body);
-  if (data) {
-    const newData = await Contact.findById(contactId);
-    res.json(newData);
+  const data = await Contact.findById(contactId);
+  if (!data) {
+    throw createError(404, 'Not found');
   }
-  return next(createError(404, 'Not found'));
+  const newData = await Contact.findByIdAndUpdate(contactId, body, {
+    new: true,
+  });
+  res.json(newData);
 };
 
 const updateStatusContact = async (req, res, next) => {
   const { contactId } = req.params;
   const favorite = req.body;
-  console.log(req.body);
-  if (favorite) {
-    const updatedContact = await Contact.findByIdAndUpdate(
-      contactId,
-      favorite,
-      {
-        new: true,
-      },
-    );
-    res.status(200).json(updatedContact);
+  const data = await Contact.findById(contactId);
+  if (!data) {
+    throw createError(404, 'Not found');
   }
-  res.status(400).json({ message: 'missing field favorite' });
-  return next(createError(404, 'Not found'));
+  if (!favorite) {
+    throw createError(400, 'missing field favorite');
+  }
+  const updatedContact = await Contact.findByIdAndUpdate(contactId, favorite, {
+    new: true,
+  });
+
+  res.status(200).json(updatedContact);
 };
 
 module.exports = {
