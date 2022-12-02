@@ -9,7 +9,6 @@ const getContacts = async (req, res, next) => {
 const getOneContactById = async (req, res, next) => {
   const { contactId } = req.params;
   const data = await Contact.findById(contactId);
-
   if (!data) {
     throw createError(404, 'Not found');
   }
@@ -23,44 +22,35 @@ const postContact = async (req, res, next) => {
 
 const deleteContact = async (req, res, next) => {
   const { contactId } = req.params;
-  const data = await Contact.findById(contactId);
-
+  const data = await Contact.findByIdAndDelete(contactId);
   if (!data) {
     throw createError(404, 'Not found');
   }
-  await Contact.findByIdAndDelete(contactId);
   res.status(200).json({ message: 'contact deleted' });
 };
 
 const updateContact = async (req, res, next) => {
   const { contactId } = req.params;
   const body = req.body;
-
-  const data = await Contact.findById(contactId);
+  const data = await Contact.findByIdAndUpdate(contactId, body, {
+    new: true,
+  });
   if (!data) {
     throw createError(404, 'Not found');
   }
-  const newData = await Contact.findByIdAndUpdate(contactId, body, {
-    new: true,
-  });
-  res.json(newData);
+  res.json(data);
 };
 
 const updateStatusContact = async (req, res, next) => {
   const { contactId } = req.params;
-  const favorite = req.body;
-  const data = await Contact.findById(contactId);
+  const body = req.body;
+  const data = await Contact.findByIdAndUpdate(contactId, body, {
+    new: true,
+  });
   if (!data) {
     throw createError(404, 'Not found');
   }
-  if (!favorite) {
-    throw createError(400, 'missing field favorite');
-  }
-  const updatedContact = await Contact.findByIdAndUpdate(contactId, favorite, {
-    new: true,
-  });
-
-  res.status(200).json(updatedContact);
+  res.json(data);
 };
 
 module.exports = {

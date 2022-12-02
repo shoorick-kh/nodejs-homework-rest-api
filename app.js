@@ -18,21 +18,9 @@ app.use((_, res) => {
   res.status(404).json({ message: 'Not found' });
 });
 
-app.use((err, _, res, next) => {
-  if (err.name === 'ValidationError') {
-    return res.status(404).json({ message: err.message });
-  }
-
-  if (err.name === 'CastError') {
-    return res.status(400).json({
-      message: err.message,
-    });
-  }
-
-  if (err.status) {
-    return res.status(err.status).json({ message: err.message });
-  }
-  return res.status(500).json({ message: 'Server internal error' });
+app.use((err, _, res, __) => {
+  const { status = 500, message = 'Server internal error' } = err;
+  return res.status(status).json({ message });
 });
 
 module.exports = app;

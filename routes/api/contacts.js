@@ -2,7 +2,7 @@ const express = require('express');
 
 const router = express.Router();
 
-const { addValidation } = require('../../middlewares/validation.js');
+const { validationBody } = require('../../middlewares/validation.js');
 const {
   postSchema,
   putSchema,
@@ -23,19 +23,19 @@ router.get('/', tryCatchWrapper(getContacts));
 
 router.get('/:contactId', tryCatchWrapper(getOneContactById));
 
-router.post('/', addValidation(postSchema), tryCatchWrapper(postContact));
+router.post('/', validationBody(postSchema), tryCatchWrapper(postContact));
 
 router.delete('/:contactId', tryCatchWrapper(deleteContact));
 
 router.put(
   '/:contactId',
-  addValidation(putSchema),
+  validationBody(putSchema),
   tryCatchWrapper(updateContact),
 );
 
 router.patch(
   '/:contactId',
-  addValidation(putchSchema),
+  validationBody(putchSchema),
   tryCatchWrapper(updateStatusContact),
 );
 
