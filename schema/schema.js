@@ -12,6 +12,7 @@ const postSchema = Joi.object({
     .max(13)
     .pattern(/^[+]?[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s./0-9]*$/)
     .required(),
+  favorite: Joi.boolean().default(false),
 });
 
 const putSchema = Joi.object({
@@ -22,11 +23,24 @@ const putSchema = Joi.object({
   phone: Joi.string()
     .min(3)
     .max(13)
-    .pattern(/^[+]?[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s./0-9]*$/)
-    .required(),
+    .pattern(/^[+]?[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s./0-9]*$/),
+  favorite: Joi.boolean().default(false),
+});
+
+const putchSchema = Joi.object({
+  name: Joi.string().alphanum().min(2),
+  email: Joi.string().pattern(
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+  ),
+  phone: Joi.string()
+    .min(3)
+    .max(13)
+    .pattern(/^[+]?[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s./0-9]*$/),
+  favorite: Joi.boolean().required(),
 });
 
 module.exports = {
   postSchema,
   putSchema,
+  putchSchema,
 };
