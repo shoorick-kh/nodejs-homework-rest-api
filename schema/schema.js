@@ -39,8 +39,20 @@ const putchSchema = Joi.object({
   favorite: Joi.boolean().required(),
 });
 
+const registerSchema = Joi.object({
+  email: Joi.string().required(),
+  password: Joi.string().min(8).required(),
+});
+
+const loginSchema = Joi.object({
+  email: Joi.string().required(),
+  password: Joi.string().min(8).required(),
+});
+
 module.exports = {
   postSchema,
   putSchema,
   putchSchema,
+  registerSchema,
+  loginSchema,
 };
