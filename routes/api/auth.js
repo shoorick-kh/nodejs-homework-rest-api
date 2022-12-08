@@ -1,9 +1,10 @@
 const express = require('express');
-const { tryCatchWrapper } = require('../../helpers/tryCatchWrapper.js');
+const { tryCatchWrapper } = require('../../middlewares/tryCatchWrapper.js');
 const authControl = require('../../controllers/authControl.js');
 const { validationBody } = require('../../middlewares/validation.js');
 const { registerSchema, loginSchema } = require('../../schema/schema.js');
 const { auth } = require('../../middlewares/auth.js');
+const { upload } = require('../../middlewares/uploadFile.js');
 
 const authRouter = express.Router();
 
@@ -26,6 +27,12 @@ authRouter.post(
   '/current',
   tryCatchWrapper(auth),
   tryCatchWrapper(authControl.current),
+);
+authRouter.patch(
+  '/avatars',
+  tryCatchWrapper(auth),
+  upload.single('avatar'),
+  tryCatchWrapper(authControl.changeAvatar),
 );
 
 module.exports = {

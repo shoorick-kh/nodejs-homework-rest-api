@@ -1,4 +1,4 @@
-const { createError } = require('../helpers/createError.js');
+const { createError } = require('./createError.js');
 const { User } = require('../models/user.js');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = process.env;

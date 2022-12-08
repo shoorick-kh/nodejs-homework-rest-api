@@ -8,7 +8,7 @@ const {
   putSchema,
   putchSchema,
 } = require('../../schema/schema.js');
-const { tryCatchWrapper } = require('../../helpers/tryCatchWrapper.js');
+const { tryCatchWrapper } = require('../../middlewares/tryCatchWrapper.js');
 
 const {
   getContacts,

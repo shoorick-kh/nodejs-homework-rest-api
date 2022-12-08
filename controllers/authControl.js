@@ -1,7 +1,11 @@
 const { User } = require('../models/user.js');
-const { createError } = require('../helpers/createError.js');
+const { createError } = require('../middlewares/createError.js');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const gravatar = require('gravatar');
+const path = require('path');
+const fs = require('fs/promises');
+const jimp = require('jimp');
 
 const { JWT_SECRET } = process.env;
 
@@ -9,7 +13,8 @@ async function register(req, res, next) {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (!user) {
-    const newUser = new User({ email, password });
+    const avatarURL = gravatar.url(email);
+    const newUser = new User({ email, password, avatarURL });
     await newUser.save();
     return res.status(201).json({ user: newUser });
   }
@@ -49,9 +54,26 @@ async function current(req, res, next) {
     .json({ email: user.email, subscription: user.subscription });
 }
 
+async function changeAvatar(req, res, next) {
+  await jimp
+    .read(req.file.path)
+    .then(file => file.resize(250, 250).write(req.file.path))
+    .catch(error => console.log(error.message));
+
+  const { _id } = req.user;
+  const newAvatarName = _id + req.file.filename;
+  const newPath = path.join(__dirname, '../public/avatars', newAvatarName);
+  const avatarURL = path.join('avatars', newAvatarName);
+  await fs.rename(req.file.path, newPath);
+  const user = await User.findByIdAndUpdate(_id, { avatarURL }, { new: true });
+
+  return res.status(200).json({ avatarURL: user.avatarURL });
+}
+
 module.exports = {
   register,
   login,
   logout,
   current,
+  changeAvatar,
 };
