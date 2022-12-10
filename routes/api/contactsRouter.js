@@ -3,12 +3,12 @@ const express = require('express');
 const contactsRouter = express.Router();
 
 const { validationBody } = require('../../middlewares/validation.js');
+const { tryCatchWrapper } = require('../../middlewares/tryCatchWrapper.js');
 const {
   postSchema,
   putSchema,
   putchSchema,
 } = require('../../schema/schema.js');
-const { tryCatchWrapper } = require('../../middlewares/tryCatchWrapper.js');
 
 const {
   getContacts,
@@ -43,4 +43,6 @@ contactsRouter.patch(
   tryCatchWrapper(updateStatusContact),
 );
 
-module.exports = contactsRouter;
+module.exports = {
+  contactsRouter,
+};

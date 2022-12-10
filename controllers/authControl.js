@@ -6,19 +6,52 @@ const gravatar = require('gravatar');
 const path = require('path');
 const fs = require('fs/promises');
 const jimp = require('jimp');
+const { v4 } = require('uuid');
+
+const { sendingMail } = require('../middlewares/senderMail.js');
 
 const { JWT_SECRET } = process.env;
 
 async function register(req, res, next) {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
+  const verificationToken = v4();
   if (!user) {
     const avatarURL = gravatar.url(email);
-    const newUser = new User({ email, password, avatarURL });
+    const newUser = new User({ email, password, avatarURL, verificationToken });
     await newUser.save();
+    sendingMail(email, verificationToken).catch(err =>
+      console.error('App error', err),
+    );
     return res.status(201).json({ user: newUser });
   }
   throw createError(409, `Email in use`);
+}
+
+async function verifyUser(req, res, next) {
+  const { verificationToken } = req.params;
+  const user = await User.findOneAndUpdate(
+    { verificationToken },
+    { verificationToken: null, verify: true },
+  );
+  if (!user) {
+    throw createError(404, 'User not found');
+  }
+  return res.status(200).json({ message: 'Verification successful' });
+}
+
+async function resendVerify(req, res, next) {
+  const { email } = req.body;
+  const verificationToken = v4();
+  const user = await User.findOne({ email });
+  if (user.verify === true) {
+    throw createError(400, 'Verification has already been passed');
+  }
+  await User.findOneAndUpdate({ email }, { verificationToken });
+  sendingMail(email, verificationToken).catch(err =>
+    console.error('App error', err),
+  );
+  return res.status(200).json({ message: 'Verification email sent' });
 }
 
 async function login(req, res, next) {
@@ -26,6 +59,9 @@ async function login(req, res, next) {
   const user = await User.findOne({ email });
   if (!user) {
     throw createError(401, 'Email is wrong');
+  }
+  if (!user.verify) {
+    throw createError(401, 'You are not verify!');
   }
   const isPassCorrect = await bcrypt.compare(password, user.password);
   if (!isPassCorrect) {
@@ -72,6 +108,8 @@ async function changeAvatar(req, res, next) {
 
 module.exports = {
   register,
+  verifyUser,
+  resendVerify,
   login,
   logout,
   current,

@@ -2,7 +2,11 @@ const express = require('express');
 const { tryCatchWrapper } = require('../../middlewares/tryCatchWrapper.js');
 const authControl = require('../../controllers/authControl.js');
 const { validationBody } = require('../../middlewares/validation.js');
-const { registerSchema, loginSchema } = require('../../schema/schema.js');
+const {
+  registerSchema,
+  loginSchema,
+  resendVerifySchema,
+} = require('../../schema/schema.js');
 const { auth } = require('../../middlewares/auth.js');
 const { upload } = require('../../middlewares/uploadFile.js');
 
@@ -12,6 +16,15 @@ authRouter.post(
   '/register',
   validationBody(registerSchema),
   tryCatchWrapper(authControl.register),
+);
+authRouter.get(
+  '/verify/:verificationToken',
+  tryCatchWrapper(authControl.verifyUser),
+);
+authRouter.post(
+  '/verify',
+  validationBody(resendVerifySchema),
+  tryCatchWrapper(authControl.resendVerify),
 );
 authRouter.post(
   '/login',

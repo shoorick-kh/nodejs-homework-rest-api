@@ -49,10 +49,15 @@ const loginSchema = Joi.object({
   password: Joi.string().min(8).required(),
 });
 
+const resendVerifySchema = Joi.object({
+  email: Joi.string().required(),
+});
+
 module.exports = {
   postSchema,
   putSchema,
   putchSchema,
   registerSchema,
   loginSchema,
+  resendVerifySchema,
 };
